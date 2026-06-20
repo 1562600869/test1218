@@ -11,11 +11,38 @@ import (
 
 var DB *sql.DB
 
+var ValidStyles = []string{"传统", "现代", "创意融合", "儿童启蒙"}
+var ValidSubjects = []string{"花鸟", "人物", "山水", "动物", "文字", "其他"}
+var ValidLevels = []string{"入门", "初级", "中级", "高级"}
+
 var LevelOrder = map[string]int{
 	"入门": 1,
 	"初级": 2,
 	"中级": 3,
 	"高级": 4,
+}
+
+func isValidStyle(style string) bool {
+	for _, s := range ValidStyles {
+		if s == style {
+			return true
+		}
+	}
+	return false
+}
+
+func isValidSubject(subject string) bool {
+	for _, s := range ValidSubjects {
+		if s == subject {
+			return true
+		}
+	}
+	return false
+}
+
+func isValidLevel(level string) bool {
+	_, ok := LevelOrder[level]
+	return ok
 }
 
 type Student struct {
@@ -121,6 +148,12 @@ func createTables() error {
 }
 
 func CreateStudent(s *Student) (int64, error) {
+	if !isValidStyle(s.Style) {
+		return 0, errors.New("风格方向必须是：传统、现代、创意融合、儿童启蒙")
+	}
+	if !isValidLevel(s.Level) {
+		return 0, errors.New("等级必须是：入门、初级、中级、高级")
+	}
 	result, err := DB.Exec(
 		"INSERT INTO students (name, phone, style, level) VALUES (?, ?, ?, ?)",
 		s.Name, s.Phone, s.Style, s.Level,
@@ -161,6 +194,9 @@ func GetStudent(id int64) (*Student, error) {
 }
 
 func PromoteStudent(id int64, toLevel string) error {
+	if !isValidLevel(toLevel) {
+		return errors.New("等级必须是：入门、初级、中级、高级")
+	}
 	s, err := GetStudent(id)
 	if err != nil {
 		return err
@@ -193,6 +229,9 @@ func PromoteStudent(id int64, toLevel string) error {
 }
 
 func CreateWork(w *Work) (int64, error) {
+	if !isValidSubject(w.Subject) {
+		return 0, errors.New("题材必须是：花鸟、人物、山水、动物、文字、其他")
+	}
 	result, err := DB.Exec(
 		"INSERT INTO works (student_id, work_name, subject, complete_date, size_desc, exhibited) VALUES (?, ?, ?, ?, ?, ?)",
 		w.StudentID, w.WorkName, w.Subject, w.CompleteDate, w.SizeDesc, w.Exhibited,
