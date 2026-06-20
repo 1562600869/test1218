@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>剪纸艺术培训中心 - 作品与展览管理系统</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: linear-gradient(135deg, #fdf2e9 0%, #fbe8d3 100%);
+    min-height: 100vh;
+    color: #333;
+}
+.header {
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+    color: #fff;
+    padding: 24px 40px;
+    box-shadow: 0 2px 12px rgba(192, 57, 43, 0.3);
+}
+.header h1 {
+    font-size: 28px;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.header p {
+    margin-top: 6px;
+    opacity: 0.9;
+    font-size: 14px;
+}
+.nav {
+    display: flex;
+    gap: 4px;
+    background: #fff;
+    padding: 0 40px;
+    border-bottom: 1px solid #eee;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.nav-btn {
+    padding: 16px 24px;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    cursor: pointer;
+    color: #666;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+.nav-btn:hover {
+    color: #c0392b;
+    background: #fdf2e9;
+}
+.nav-btn.active {
+    color: #c0392b;
+    border-bottom-color: #c0392b;
+    background: #fdf2e9;
+}
+.container {
+    padding: 32px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.panel { display: none; }
+.panel.active { display: block; }
+.card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #c0392b;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #fbe8d3;
+}
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 14px;
+}
+.form-group label {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+.form-group input, .form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: #fafafa;
+}
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: #c0392b;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.1);
+}
+.btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+    color: #fff;
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(192,57,43,0.3); }
+.btn-secondary {
+    background: #f5f5f5;
+    color: #666;
+    border: 1px solid #ddd;
+}
+.btn-secondary:hover { background: #eee; }
+.btn-small {
+    padding: 5px 12px;
+    font-size: 12px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+th {
+    background: #fdf2e9;
+    color: #c0392b;
+    font-weight: 600;
+    font-size: 13px;
+}
+tbody tr:hover { background: #fdf8f4; }
+.tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+.tag-style-传统 { background: #fdecea; color: #c0392b; }
+.tag-style-现代 { background: #eaf2fd; color: #2980b9; }
+.tag-style-创意融合 { background: #fdf3ea; color: #d35400; }
+.tag-style-儿童启蒙 { background: #eafaf1; color: #27ae60; }
+.tag-level-入门 { background: #ecf0f1; color: #7f8c8d; }
+.tag-level-初级 { background: #d5f5e3; color: #27ae60; }
+.tag-level-中级 { background: #fef9e7; color: #b7950b; }
+.tag-level-高级 { background: #fadbd8; color: #c0392b; }
+.tag-flag { background: #ecf0f1; color: #95a5a6; }
+.tag-flag-1 { background: #d5f5e3; color: #27ae60; }
+.empty {
+    text-align: center;
+    padding: 40px;
+    color: #aaa;
+    font-size: 14px;
+}
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+.stat-card {
+    background: linear-gradient(135deg, #fdf2e9 0%, #fbe8d3 100%);
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+    border: 1px solid #f5d5b9;
+}
+.stat-card h3 {
+    font-size: 36px;
+    color: #c0392b;
+    margin-bottom: 8px;
+}
+.stat-card p {
+    color: #7f5539;
+    font-size: 14px;
+}
+.stat-bar {
+    margin-top: 8px;
+    background: rgba(192,57,43,0.15);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.stat-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #c0392b, #e74c3c);
+    border-radius: 3px;
+}
+.promote-select {
+    padding: 5px 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-right: 6px;
+}
+.action-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    z-index: 9999;
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.toast.success { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+.toast.error { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+.exhibition-item {
+    border: 1px solid #f0e6dc;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: #fefaf6;
+}
+.exhibition-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed #f0e6dc;
+}
+.exhibition-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #c0392b;
+}
+.exhibition-meta {
+    font-size: 12px;
+    color: #888;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>✂ 剪纸艺术培训中心</h1>
+    <p>学员作品与展览管理系统</p>
+</div>
+
+<div class="nav">
+    <button class="nav-btn active" data-tab="students">学员管理</button>
+    <button class="nav-btn" data-tab="works">作品管理</button>
+    <button class="nav-btn" data-tab="exhibitions">展览管理</button>
+    <button class="nav-btn" data-tab="stats">数据统计</button>
+</div>
+
+<div class="container">
+
+<div class="panel active" id="panel-students">
+    <div class="card">
+        <div class="card-title">＋ 新增学员</div>
+        <div class="form-grid">
+            <div class="form-group"><label>昵称 *</label><input type="text" id="s-name" placeholder="请输入学员昵称"></div>
+            <div class="form-group"><label>手机 *</label><input type="text" id="s-phone" placeholder="请输入手机号码"></div>
+            <div class="form-group"><label>风格方向 *</label>
+                <select id="s-style">
+                    <option value="">请选择</option>
+                    <option value="传统">传统</option>
+                    <option value="现代">现代</option>
+                    <option value="创意融合">创意融合</option>
+                    <option value="儿童启蒙">儿童启蒙</option>
+                </select>
+            </div>
+            <div class="form-group"><label>等级</label>
+                <select id="s-level">
+                    <option value="入门">入门</option>
+                    <option value="初级">初级</option>
+                    <option value="中级">中级</option>
+                    <option value="高级">高级</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="addStudent()">保存学员</button>
+    </div>
+
+    <div class="card">
+        <div class="card-title">📋 学员列表</div>
+        <table id="students-table">
+            <thead><tr><th>ID</th><th>昵称</th><th>手机</th><th>风格方向</th><th>等级</th><th>晋升操作</th></tr></thead>
+            <tbody id="students-tbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel" id="panel-works">
+    <div class="card">
+        <div class="card-title">＋ 新增作品</div>
+        <div class="form-grid">
+            <div class="form-group"><label>学员 *</label><select id="w-student"><option value="">请选择学员</option></select></div>
+            <div class="form-group"><label>作品名 *</label><input type="text" id="w-name" placeholder="请输入作品名称"></div>
+            <div class="form-group"><label>题材 *</label>
+                <select id="w-subject">
+                    <option value="">请选择</option>
+                    <option value="花鸟">花鸟</option>
+                    <option value="人物">人物</option>
+                    <option value="山水">山水</option>
+                    <option value="动物">动物</option>
+                    <option value="文字">文字</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+            <div class="form-group"><label>完成日期 *</label><input type="date" id="w-date"></div>
+            <div class="form-group"><label>尺寸描述</label><input type="text" id="w-size" placeholder="如：30×40cm"></div>
+        </div>
+        <button class="btn btn-primary" onclick="addWork()">保存作品</button>
+    </div>
+
+    <div class="card">
+        <div class="card-title">🎨 作品列表</div>
+        <table>
+            <thead><tr><th>ID</th><th>作品名</th><th>学员</th><th>题材</th><th>完成日期</th><th>尺寸</th><th>参展状态</th></tr></thead>
+            <tbody id="works-tbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="panel" id="panel-exhibitions">
+    <div class="card">
+        <div class="card-title">＋ 新增展览</div>
+        <div class="form-grid">
+            <div class="form-group"><label>展览名 *</label><input type="text" id="e-name" placeholder="如：新春剪纸艺术展"></div>
+            <div class="form-group"><label>开始日期 *</label><input type="date" id="e-start"></div>
+            <div class="form-group"><label>结束日期 *</label><input type="date" id="e-end"></div>
+            <div class="form-group"><label>地点 *</label><input type="text" id="e-location" placeholder="如：市文化馆二楼展厅"></div>
+        </div>
+        <button class="btn btn-primary" onclick="addExhibition()">创建展览</button>
+    </div>
+
+    <div class="card">
+        <div class="card-title">🏛 展览列表</div>
+        <div id="exhibitions-list"></div>
+    </div>
+</div>
+
+<div class="panel" id="panel-stats">
+    <div class="card">
+        <div class="card-title">📊 本月各题材作品数量统计</div>
+        <div class="stats-grid" id="stats-grid"></div>
+    </div>
+</div>
+
+</div>
+
+<script>
+const API = '';
+
+function toast(msg, type) {
+    const el = document.createElement('div');
+    el.className = 'toast ' + (type || 'success');
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+}
+
+async function request(url, method, data) {
+    const opts = { method: method || 'GET', headers: { 'Content-Type': 'application/json' } };
+    if (data) opts.body = JSON.stringify(data);
+    const res = await fetch(API + url, opts);
+    return await res.json();
+}
+
+document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+        if (btn.dataset.tab === 'stats') loadStats();
+        if (btn.dataset.tab === 'exhibitions') loadExhibitions();
+        if (btn.dataset.tab === 'works') { loadWorks(); loadStudentOptions(); }
+    });
+});
+
+async function addStudent() {
+    const data = {
+        name: document.getElementById('s-name').value.trim(),
+        phone: document.getElementById('s-phone').value.trim(),
+        style: document.getElementById('s-style').value,
+        level: document.getElementById('s-level').value
+    };
+    const res = await request('/api/students', 'POST', data);
+    if (res.code === 0) {
+        toast('学员添加成功');
+        ['s-name', 's-phone'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('s-style').value = '';
+        loadStudents();
+    } else {
+        toast(res.msg, 'error');
+    }
+}
+
+async function loadStudents() {
+    const res = await request('/api/students', 'GET');
+    const tbody = document.getElementById('students-tbody');
+    if (res.code !== 0 || !res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">暂无学员数据</td></tr>';
+        return;
+    }
+    const levels = ['入门', '初级', '中级', '高级'];
+    tbody.innerHTML = res.data.map(s => {
+        const curIdx = levels.indexOf(s.level);
+        const nextLevels = levels.slice(curIdx + 1);
+        const promoteSel = nextLevels.length > 0
+            ? `<select class="promote-select" id="prom-${s.id}">${nextLevels.map(l => `<option value="${l}">${l}</option>`).join('')}</select>
+               <button class="btn btn-primary btn-small" onclick="promoteStudent(${s.id})">晋升</button>`
+            : `<span style="color:#95a5a6;font-size:12px;">已达最高等级</span>`;
+        return `<tr>
+            <td>${s.id}</td><td>${s.name}</td><td>${s.phone}</td>
+            <td><span class="tag tag-style-${s.style}">${s.style}</span></td>
+            <td><span class="tag tag-level-${s.level}">${s.level}</span></td>
+            <td class="action-wrap">${promoteSel}</td>
+        </tr>`;
+    }).join('');
+}
+
+async function promoteStudent(id) {
+    const level = document.getElementById('prom-' + id).value;
+    const res = await request('/api/students/promote/' + id, 'POST', { level });
+    if (res.code === 0) {
+        toast('晋升成功');
+        loadStudents();
+    } else {
+        toast(res.msg, 'error');
+    }
+}
+
+async function loadStudentOptions() {
+    const res = await request('/api/students', 'GET');
+    const sel = document.getElementById('w-student');
+    if (res.code === 0 && res.data) {
+        sel.innerHTML = '<option value="">请选择学员</option>' +
+            res.data.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+    }
+}
+
+async function addWork() {
+    const data = {
+        student_id: parseInt(document.getElementById('w-student').value) || 0,
+        work_name: document.getElementById('w-name').value.trim(),
+        subject: document.getElementById('w-subject').value,
+        complete_date: document.getElementById('w-date').value,
+        size_desc: document.getElementById('w-size').value.trim(),
+        exhibited: 0
+    };
+    const res = await request('/api/works', 'POST', data);
+    if (res.code === 0) {
+        toast('作品添加成功');
+        ['w-name', 'w-size', 'w-date'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('w-subject').value = '';
+        document.getElementById('w-student').value = '';
+        loadWorks();
+    } else {
+        toast(res.msg, 'error');
+    }
+}
+
+async function loadWorks() {
+    const res = await request('/api/works', 'GET');
+    const tbody = document.getElementById('works-tbody');
+    if (res.code !== 0 || !res.data || res.data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty">暂无作品数据</td></tr>';
+        return;
+    }
+    tbody.innerHTML = res.data.map(w => `<tr>
+        <td>${w.id}</td><td>${w.work_name}</td><td>${w.student_name || '-'}</td>
+        <td>${w.subject}</td><td>${w.complete_date}</td><td>${w.size_desc || '-'}</td>
+        <td><span class="tag tag-flag tag-flag-${w.exhibited}">${w.exhibited ? '已参展' : '未参展'}</span></td>
+    </tr>`).join('');
+}
+
+async function addExhibition() {
+    const data = {
+        name: document.getElementById('e-name').value.trim(),
+        start_date: document.getElementById('e-start').value,
+        end_date: document.getElementById('e-end').value,
+        location: document.getElementById('e-location').value.trim()
+    };
+    const res = await request('/api/exhibitions', 'POST', data);
+    if (res.code === 0) {
+        toast('展览创建成功');
+        ['e-name', 'e-start', 'e-end', 'e-location'].forEach(id => document.getElementById(id).value = '');
+        loadExhibitions();
+    } else {
+        toast(res.msg, 'error');
+    }
+}
+
+async function loadExhibitions() {
+    const res = await request('/api/exhibitions', 'GET');
+    const wrap = document.getElementById('exhibitions-list');
+    if (res.code !== 0 || !res.data || res.data.length === 0) {
+        wrap.innerHTML = '<div class="empty">暂无展览数据</div>';
+        return;
+    }
+    const worksRes = await request('/api/works', 'GET');
+    const works = (worksRes.code === 0 && worksRes.data) ? worksRes.data : [];
+
+    wrap.innerHTML = (await Promise.all(res.data.map(async e => {
+        const ewRes = await request('/api/exhibitions/works/' + e.id, 'GET');
+        const eworks = (ewRes.code === 0 && ewRes.data) ? ewRes.data : [];
+        const workOpts = works
+            .filter(w => !eworks.find(ew => ew.work_id === w.id))
+            .map(w => `<option value="${w.id}">${w.work_name} - ${w.student_name || '未知学员'}</option>`)
+            .join('');
+        const worksTable = eworks.length > 0
+            ? `<table style="margin-top:10px;">
+                <thead><tr><th>作品ID</th><th>作品名</th><th>学员</th></tr></thead>
+                <tbody>${eworks.map(ew => `<tr><td>${ew.work_id}</td><td>${ew.work_name}</td><td>${ew.student_name || '-'}</td></tr>`).join('')}</tbody>
+               </table>`
+            : '<div class="empty" style="padding:16px;font-size:13px;">暂无参展作品</div>';
+        return `<div class="exhibition-item">
+            <div class="exhibition-header">
+                <div>
+                    <div class="exhibition-name">${e.name}</div>
+                    <div class="exhibition-meta">📅 ${e.start_date} ~ ${e.end_date} &nbsp; 📍 ${e.location}</div>
+                </div>
+            </div>
+            <div class="form-grid" style="grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 0;">
+                <div class="form-group"><label>选择作品参展</label>
+                    <select id="ew-work-${e.id}"><option value="">请选择作品</option>${workOpts}</select>
+                </div>
+                <div class="form-group"><label>&nbsp;</label>
+                    <button class="btn btn-primary" style="width:100%;" onclick="addExhibitionWork(${e.id})">添加参展</button>
+                </div>
+            </div>
+            ${worksTable}
+        </div>`;
+    }))).join('');
+}
+
+async function addExhibitionWork(eid) {
+    const workId = parseInt(document.getElementById('ew-work-' + eid).value) || 0;
+    if (!workId) { toast('请选择作品', 'error'); return; }
+    const res = await request('/api/exhibitions/works/' + eid, 'POST', { work_id: workId });
+    if (res.code === 0) {
+        toast('参展添加成功');
+        loadExhibitions();
+    } else {
+        toast(res.msg, 'error');
+    }
+}
+
+async function loadStats() {
+    const res = await request('/api/stats/monthly-subjects', 'GET');
+    const grid = document.getElementById('stats-grid');
+    if (res.code !== 0 || !res.data || res.data.length === 0) {
+        grid.innerHTML = '<div class="empty" style="grid-column:1/-1;">本月暂无作品数据</div>';
+        return;
+    }
+    const max = Math.max(...res.data.map(s => s.count));
+    grid.innerHTML = res.data.map(s => `<div class="stat-card">
+        <h3>${s.count}</h3>
+        <p>${s.subject}</p>
+        <div class="stat-bar"><div class="stat-bar-fill" style="width:${(s.count / max * 100).toFixed(1)}%"></div></div>
+    </div>`).join('');
+}
+
+(function init() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('w-date').value = today;
+    loadStudents();
+    loadStudentOptions();
+})();
+</script>
+</body>
+</html>
